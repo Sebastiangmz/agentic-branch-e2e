@@ -1,7 +1,7 @@
 ---
 name: agentic-branch-e2e
-description: "Use when the user asks to end-to-end test a feature branch as a real user in a running app, to verify a branch fulfills its purpose, or to bug-hunt a branch in the live UI + backend. The skill is stack-agnostic and project-agnostic — it inspects the project (manifest, scripts, services, runtime), then drives the running app as a user would while monitoring every observable signal (UI state, network, backend state, logs, errors), asserting the branch actually delivers the requested work and nothing else. Always-on when triggered: do not silently pass a 'the flow walks' check — derive a real correctness verdict per acceptance criterion AND attempt to break the change with inferred negative cases."
-version: 1.1.0
+description: "This skill should be used when the user asks to end-to-end test a feature branch as a real user in a running app, to verify a branch fulfills its purpose, or to bug-hunt a branch in the live UI + backend. The skill is stack-agnostic and project-agnostic — it inspects the project (manifest, scripts, services, runtime), then drives browser-visible UI through Playwright while monitoring every observable signal (UI state, network, backend state, logs, errors), asserting the branch actually delivers the requested work and nothing else. Always-on when triggered: do not silently pass a 'the flow walks' check — derive a real correctness verdict per acceptance criterion AND attempt to break the change with inferred negative cases."
+version: 1.1.1
 author: Chenko
 license: MIT
 metadata:
