@@ -16,7 +16,6 @@
 - HTTP adapter: unavailable because route depended on missing auth emulator
 - Missing prerequisite: project-supported auth provider emulator
 
-
 ## Scope classification
 
 - In-scope: invite email-domain validation.
@@ -30,14 +29,14 @@
 - Source: explicit user request
 - Production path intended: browser UI → session auth → `POST /api/invites` → request schema validation → invite service → email queue → database
 - Production path exercised: invite service → database
-- Drive plan attempted: open invite UI and submit `person@gmail.com` as an admin.
+- Drive plan attempted: open invite UI and submit `external-user@example.test` as an admin.
 
 Evidence:
 
 - UI: not captured; local app could not start because the auth provider emulator was missing.
 - Network: not captured for `POST /api/invites`.
 - Logs: `artifacts/startup.log#18-24`, auth emulator connection refused.
-- Backend state: `artifacts/service-unit-output.txt`, direct service call rejected gmail domain.
+- Backend state: `artifacts/service-unit-output.txt`, direct service call rejected external test domain.
 - Errors: startup error in auth emulator dependency.
 
 Assertions:
@@ -60,7 +59,7 @@ Reason: The direct service call suggests the domain rule exists, but the real in
 
 ## Negative cases
 
-### N1 — Gmail invite is rejected
+### N1 — External-domain invite is rejected
 
 - Criterion: C1
 - Expected: UI/route rejects request with a user-visible error and no invite row.
@@ -74,7 +73,7 @@ Reason: The direct service call suggests the domain rule exists, but the real in
 
 ## Required next action
 
-Start or mock the auth provider through the project-supported local mechanism, then rerun C1 from the browser UI or real HTTP route. Do not reuse the internal service call as proof.
+Start the project-supported auth emulator or local test identity provider, then rerun C1 from the browser UI or real HTTP route. Do not use a hand-rolled auth bypass, and do not reuse the internal service call as proof.
 
 ## Teardown
 
