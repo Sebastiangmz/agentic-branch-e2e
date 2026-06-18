@@ -1,7 +1,7 @@
 ---
 name: agentic-branch-e2e
-description: "This skill should be used when the user asks to end-to-end test a feature branch as a real user in a locally running app, verify that a branch fulfills its issue or requested behavior, or bug-hunt UI plus backend behavior before merge. It is harness-agnostic: use the strongest available browser, HTTP, CLI, git, issue, log, and evidence adapters; for browser-visible UI use a Playwright-capable driver, and in OMP/Claude-like harnesses load skill://playwright when available. Do not pass a 'flow walks' check; produce criterion-level PASS/FAIL/INCONCLUSIVE verdicts with evidence and negative cases."
-version: 1.2.0
+description: "This skill should be used when the user asks to end-to-end test a feature branch as a real user in a locally running app, verify that a branch fulfills its issue or requested behavior, or bug-hunt UI plus backend behavior before merge. It is harness-agnostic: use the strongest available browser, HTTP, CLI, git, issue, log, and evidence adapters; for browser-visible UI prefer a visible/headed Playwright-capable browser so the user can watch the real app flow, and in OMP/Claude-like harnesses load skill://playwright when available. Do not pass a 'flow walks' check; produce criterion-level PASS/FAIL/INCONCLUSIVE verdicts with evidence and negative cases."
+version: 1.2.1
 author: Chenko
 license: MIT
 metadata:
@@ -17,7 +17,7 @@ Run a feature branch locally as a real user would, then decide whether the branc
 
 - Prove behavior through the real entry path, not through internal handlers.
 - Prefer issue/user-request scope; if absent, infer scope from the branch diff and label it inferred.
-- Use a Playwright-capable browser driver for browser-visible UI. In OMP/Claude-like harnesses, load `skill://playwright` when available.
+- Use a visible/headed Playwright-capable browser driver for browser-visible UI whenever the harness supports it. In OMP/Claude-like harnesses, load `skill://playwright` when available and prefer a real app browser window over hidden/headless automation.
 - Use real HTTP routes, real CLI commands, or real queue producers for backend-only surfaces.
 - Capture UI, network, logs, backend state, and errors for every criterion.
 - Emit `PASS`, `FAIL`, or `INCONCLUSIVE` per criterion and per negative case.
@@ -78,7 +78,7 @@ For every criterion:
 5. Assert the strong expectation and weak expectations.
 6. Record `PASS`, `FAIL`, or `INCONCLUSIVE` with evidence pointers.
 
-For browser-visible UI, use a Playwright-capable driver. Start from observable UI state, interact through semantic/accessible controls when possible, re-observe after navigation or DOM-changing actions, and collect browser evidence. In OMP, this means loading `skill://playwright` and using the browser tool.
+For browser-visible UI, prefer a visible/headed browser so the user can watch the real app flow while evidence is captured. Use headless or hidden browser automation only when live observation is not requested or the harness cannot open a physical browser; record that limitation as an adapter constraint. Start from observable UI state, interact through semantic/accessible controls when possible, re-observe after navigation or DOM-changing actions, and collect browser evidence. In OMP, this means loading `skill://playwright` and using the browser tool with a visible app target when available.
 
 ### Phase 5 — Bug-hunt negative cases
 
@@ -150,7 +150,7 @@ Before declaring the E2E passed, confirm:
 - [ ] Scope creep was classified and gated.
 - [ ] Stack was started with project-native commands.
 - [ ] Each criterion was driven through the real ingress.
-- [ ] Browser-visible UI used a Playwright-capable driver when available.
+- [ ] Browser-visible UI used a visible/headed Playwright-capable driver when available, or recorded why only headless/hidden automation was possible.
 - [ ] Production path layers were enumerated.
 - [ ] Bypassed layers were marked as fidelity gaps and INCONCLUSIVE.
 - [ ] Changed contracts were tested through the real caller.

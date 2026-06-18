@@ -19,7 +19,7 @@ unknown harnesses instead of adding harness-specific assumptions to the protocol
 
 Use the strongest local adapter that can exercise the real entry path without bypassing layers.
 
-1. Harness-native browser automation for browser-visible UI.
+1. Visible/headed harness-native browser automation for browser-visible UI, so the user can watch the real app flow.
 2. Harness-native HTTP/API/CLI execution for backend-only criteria.
 3. Project-provided E2E runner or fixture helpers when they still drive the real app through ingress.
 4. Manual command/browser instructions only when automation is unavailable; mark unobserved evidence as INCONCLUSIVE.
@@ -30,18 +30,38 @@ Never choose an adapter because it is convenient if it bypasses auth, validation
 
 A browser adapter must support, or have an equivalent for:
 
-- opening a local app URL,
+- opening a local app URL in a visible/headed browser when the harness allows it,
 - observing accessible UI state or DOM state,
 - clicking, typing, selecting, scrolling, and uploading like a user,
 - waiting for navigation, UI changes, and network responses,
 - capturing URL, DOM/accessibility state, screenshots, console errors, and network request/response evidence,
 - preserving realistic browser behavior such as disabled controls, focus, cookies, storage, and redirects.
 
-Prefer semantic locators and accessibility snapshots. Avoid brittle generated CSS selectors unless there is no stable semantic handle.
+Prefer semantic locators and accessibility snapshots. Avoid brittle generated CSS selectors unless there is no stable semantic handle. Prefer hidden/headless browser automation only when the user does not need live observation or the harness cannot open a visible browser; record that limitation in the run record.
 
 ### OMP / Claude-like harness
 
-When a harness exposes skills or resources, load the local browser automation instructions before driving UI. In OMP, load `skill://playwright` and use the `browser` tool. Treat Playwright as the hands, not the judge.
+When a harness exposes skills or resources, load the local browser automation instructions before driving UI. In OMP, load `skill://playwright` and use the `browser` tool. Prefer opening a real browser app window with an isolated temporary profile, then drive that visible window. Treat Playwright as the hands, not the judge.
+
+OMP visible-browser pattern:
+
+```json
+{
+  "action": "open",
+  "name": "e2e",
+  "url": "http://localhost:<port>",
+  "app": {
+    "path": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "args": [
+      "--new-window",
+      "--user-data-dir=/tmp/agentic-branch-e2e-chrome"
+    ]
+  },
+  "viewport": { "width": 1440, "height": 1000 }
+}
+```
+
+Use a temporary browser profile by default. Do not drive the user's personal browser profile unless explicitly requested.
 
 ### Generic Playwright harness
 
