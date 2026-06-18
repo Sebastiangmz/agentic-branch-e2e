@@ -16,6 +16,12 @@
 - Auth gate: admin login with seeded local admin
 - Temporary edits: none
 
+## Scope classification
+
+- In-scope: refund approval UI, `POST /api/refunds/:id/approve`, audit-row persistence.
+- Inferred-support: seeded admin account and pending refund fixture.
+- Out-of-scope: none observed in the branch diff.
+
 ## Frozen criteria
 
 ### C1 — Admin can approve a pending refund

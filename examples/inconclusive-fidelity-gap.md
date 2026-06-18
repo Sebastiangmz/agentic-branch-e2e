@@ -17,6 +17,12 @@
 - Missing prerequisite: project-supported auth provider emulator
 
 
+## Scope classification
+
+- In-scope: invite email-domain validation.
+- Inferred-support: local auth provider emulator required to reach the real route.
+- Out-of-scope: none observed in the branch diff.
+
 ## Frozen criteria
 
 ### C1 — Creating an invite rejects non-company email domains

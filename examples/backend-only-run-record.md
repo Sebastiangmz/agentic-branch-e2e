@@ -16,6 +16,12 @@
 - HTTP adapter: real local route with HMAC signature and JSON serialization
 - Temporary edits: local webhook secret placeholder in ignored env file
 
+## Scope classification
+
+- In-scope: webhook signature rotation accepting active and next secrets.
+- Inferred-support: local queue/database fixtures required to observe processing.
+- Out-of-scope: none observed in the branch diff.
+
 ## Frozen criteria
 
 ### C1 — Webhook accepts both active and next signing secrets during rotation
