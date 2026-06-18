@@ -8,6 +8,15 @@
 - App entrypoint: intended `POST /api/invites`
 - Overall verdict: `INCONCLUSIVE`
 
+## Project profile
+
+- Runtime: Node API with browser UI
+- Services attempted: web, api
+- Browser adapter: unavailable because app startup halted before UI loaded
+- HTTP adapter: unavailable because route depended on missing auth emulator
+- Missing prerequisite: project-supported auth provider emulator
+
+
 ## Frozen criteria
 
 ### C1 — Creating an invite rejects non-company email domains
