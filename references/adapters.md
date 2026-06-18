@@ -2,6 +2,19 @@
 
 This skill is a protocol first. Harness-specific tools are adapters. The protocol owns scope, criteria, evidence, negative cases, fidelity gaps, and verdicts. Adapters only execute actions or fetch context.
 
+## Installer adapter
+
+Use `scripts/install-skill.py` to install the skill payload into an agent harness. Copy mode uses
+an explicit allowlist; symlink mode links the trusted source checkout for development. Presets are intentionally thin:
+
+- `--harness claude-code` → `~/.claude/skills/`
+- `--harness omp` → `~/.omp/agent/skills/`
+- `--harness hermes` → `~/.hermes/skills/`
+- `--harness generic --target <dir>` → any harness skills directory
+
+The installer is dry-run by default. Pass `--i-approve` to write files. Use `--target` for
+unknown harnesses instead of adding harness-specific assumptions to the protocol.
+
 ## Adapter selection order
 
 Use the strongest local adapter that can exercise the real entry path without bypassing layers.
