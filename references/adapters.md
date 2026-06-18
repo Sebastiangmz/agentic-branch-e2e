@@ -45,6 +45,10 @@ When a harness exposes skills or resources, load the local browser automation in
 
 OMP visible-browser pattern:
 
+1. Create a unique throwaway browser profile directory before opening the browser, for example with `mktemp -d` or the harness temp-dir API.
+2. Pass that directory as `--user-data-dir=<throwaway-profile-dir>`.
+3. Record the profile path in teardown state and delete it after the run.
+
 ```json
 {
   "action": "open",
@@ -54,14 +58,14 @@ OMP visible-browser pattern:
     "path": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "args": [
       "--new-window",
-      "--user-data-dir=/tmp/agentic-branch-e2e-chrome"
+      "--user-data-dir=<unique-throwaway-profile-dir>"
     ]
   },
   "viewport": { "width": 1440, "height": 1000 }
 }
 ```
 
-Use a temporary browser profile by default. Do not drive the user's personal browser profile unless explicitly requested.
+Never drive the user's personal Chrome/browser profile for E2E. Use an isolated throwaway profile even when the user wants to watch the browser window; copy only explicit local/test auth state into that profile when required.
 
 ### Generic Playwright harness
 
