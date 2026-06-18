@@ -110,6 +110,23 @@ Return one run record containing:
 
 Use `references/evidence-model.md` for the detailed shape. Use `references/verdict-rules.md` to derive verdicts. Use `scripts/validate-run-record.py` to check that a markdown run record includes the required sections and verdict language.
 
+## Installation command
+
+Use `scripts/install-skill.py` to install this skill into an agent harness. The command is
+dry-run by default and writes only with `--i-approve`.
+
+Common targets:
+
+```bash
+python3 scripts/install-skill.py --harness claude-code
+python3 scripts/install-skill.py --harness omp
+python3 scripts/install-skill.py --harness hermes
+python3 scripts/install-skill.py --harness generic --target /path/to/skills
+```
+
+Add `--i-approve` to install, `--force` to replace an existing install, and `--mode symlink`
+for development installs that should track this checkout.
+
 ## References
 
 - `references/protocol.md` — full harness-agnostic protocol, anti-mask rules, phases, and changed-contract check.
