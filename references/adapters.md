@@ -4,8 +4,8 @@ This skill is a protocol first. Harness-specific tools are adapters. The protoco
 
 ## Installer adapter
 
-Use `scripts/install-skill.py` to copy or symlink the whole skill directory into an agent
-harness. Presets are intentionally thin:
+Use `scripts/install-skill.py` to install the skill payload into an agent harness. Copy mode uses
+an explicit allowlist; symlink mode links the trusted source checkout for development. Presets are intentionally thin:
 
 - `--harness claude-code` → `~/.claude/skills/`
 - `--harness omp` → `~/.omp/agent/skills/`
