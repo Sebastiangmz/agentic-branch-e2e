@@ -53,7 +53,7 @@ Out-of-scope behavior must be classified before testing:
 
 ### Phase 0 — Build the project profile
 
-Inspect the repository. Discover package manager, runtime, workspace layout, start commands, service dependencies, env requirements, auth/compliance gates, base branch, existing E2E helpers, and local constraints. Stop if a required service, credential class, binary, or runtime cannot be made available without faking the system.
+Inspect the repository. Discover package manager, runtime, workspace layout, start commands, service dependencies, env requirements, auth/compliance gates, base branch, existing E2E helpers, and local constraints. Identify required credential classes, but use only local/test credentials or safe placeholders. Stop if a required service, credential class, binary, or runtime cannot be made available without faking the system or exposing production secrets.
 
 ### Phase 1 — Freeze criteria
 
@@ -65,7 +65,7 @@ Diff the branch against the base branch. Classify every changed behavior as in-s
 
 ### Phase 3 — Stand up the real stack
 
-Use project-native commands to install dependencies, start services, apply migrations/seeds, and start the app. Sanity-check the stack through a low-risk real request. Capture startup logs and record temporary edits for teardown.
+Use project-native commands to install dependencies, start services, apply migrations/seeds, and start the app under a minimal local/test environment. Scrub inherited production credentials before running branch code. Sanity-check the stack through a low-risk real request. Capture startup logs and record temporary edits for teardown.
 
 ### Phase 4 — Drive real user behavior
 

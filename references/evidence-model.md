@@ -89,6 +89,8 @@ Use stable pointers: file paths, artifact IDs, URLs, command outputs, screenshot
 
 Do not expose secrets, session tokens, API keys, private user data, or credentials in the run record. Redact values while preserving field names and behavior-relevant shapes.
 
+Before running branch code, use only local/test credentials or safe placeholders. Scrub inherited production secrets from the runtime environment. If a real credential would be required to exercise the path, mark the affected criterion INCONCLUSIVE instead of using production access.
+
 ## Minimum evidence by verdict
 
 PASS requires:

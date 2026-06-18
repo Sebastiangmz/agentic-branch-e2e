@@ -47,7 +47,7 @@ Produce a project profile with:
 - existing E2E helpers and fixtures,
 - known local constraints.
 
-Stop if a required dependency, service, credential class, or runtime cannot be obtained locally. Do not fake a service.
+Stop if a required dependency, service, credential class, or runtime cannot be obtained locally with safe local/test credentials. Do not fake a service, pass production credentials to branch code, or inherit sensitive environment variables into untrusted startup commands.
 
 ### Phase 1 — Freeze criteria
 
@@ -59,7 +59,7 @@ Diff the branch against the base branch. Classify each change as in-scope, infer
 
 ### Phase 3 — Stand up the real stack
 
-Install dependencies if required, start services with project-native commands, apply migrations/seeds with project-native commands, start the app, and sanity-check the stack through a low-risk real request. Capture startup logs and record every temporary edit for teardown.
+Install dependencies if required, start services with project-native commands, apply migrations/seeds with project-native commands, start the app under a minimal local/test environment, and sanity-check the stack through a low-risk real request. Scrub inherited production secrets before running branch code. Capture startup logs and record every temporary edit for teardown.
 
 ### Phase 4 — Drive real user behavior
 
