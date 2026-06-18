@@ -13,6 +13,7 @@ from pathlib import Path
 
 REQUIRED_PHRASES = [
     "Project profile",
+    "Scope classification",
     "Frozen criteria",
     "Evidence",
     "Negative cases",
@@ -24,8 +25,11 @@ VERDICT_RE = re.compile(r"\b(PASS|FAIL|INCONCLUSIVE)\b")
 CRITERION_RE = re.compile(r"\bC\d+\b")
 NEGATIVE_RE = re.compile(r"\bN\d+\b")
 FIDELITY_RE = re.compile(r"fidelity gap|fidelity gaps|bypassed layer", re.IGNORECASE)
-MERGE_BOUNDARY_RE = re.compile(r"merge readiness|merge-ready|CI|review", re.IGNORECASE)
-EVIDENCE_POINTER_RE = re.compile(r"(artifacts?/|artifact://|https?://|\.har\b|\.png\b|\.txt\b|log#|db\.txt)")
+MERGE_BOUNDARY_RE = re.compile(r"not covered|merge readiness|merge-ready|CI|review", re.IGNORECASE)
+EVIDENCE_POINTER_RE = re.compile(
+    r"(artifacts?/|artifact://|local://|mcp://|https?://|stdout:|stderr:|\.har\b|\.png\b|\.jpe?g\b|\.webm\b|\.log\b|\.jsonl?\b|\.txt\b|\.sqlite\b|log#|db\.txt)"
+)
+WEAK_FLOW_RE = re.compile(r"(?<!not )\bthe flow walked\b", re.IGNORECASE)
 
 
 def validate(text: str) -> list[str]:
@@ -54,8 +58,8 @@ def validate(text: str) -> list[str]:
     if not MERGE_BOUNDARY_RE.search(text):
         errors.append("missing merge/CI/review boundary statement")
 
-    if "the flow walked" in text.lower() and "not" not in text.lower():
-        errors.append("contains a likely weak 'flow walked' verdict")
+    if WEAK_FLOW_RE.search(text):
+        errors.append("contains a likely weak 'the flow walked' verdict")
 
     return errors
 

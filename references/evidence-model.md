@@ -16,6 +16,12 @@ run:
   started_services: [string]
   temporary_edits: [string]
 
+scope_classification:
+  in_scope: [string]
+  inferred_support: [string]
+  out_of_scope: [string]
+  unresolved: [string]
+
 criteria:
   - id: C1
     text: string
