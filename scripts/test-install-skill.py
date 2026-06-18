@@ -132,6 +132,49 @@ class InstallSkillTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("symlinked payload", result.stderr + result.stdout)
 
+    def test_symlinked_payload_directory_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = self.make_source(root / "src")
+            outside = root / "outside"
+            outside.mkdir()
+            shutil_target = source / "references"
+            shutil_target.rename(root / "original-references")
+            (outside / "protocol.md").write_text("external protocol\n", encoding="utf-8")
+            (outside / "adapters.md").write_text("SECRET_FROM_OUTSIDE\n", encoding="utf-8")
+            (outside / "evidence-model.md").write_text("external evidence\n", encoding="utf-8")
+            (outside / "verdict-rules.md").write_text("external verdicts\n", encoding="utf-8")
+            shutil_target.symlink_to(outside, target_is_directory=True)
+            result = self.run_installer("--source", str(source), "--harness", "generic", "--target", str(root / "target"), "--i-approve")
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("symlinked payload", result.stderr + result.stdout)
+
+    def test_force_replaces_destination_symlink_without_deleting_target(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = self.make_source(root / "src")
+            target = root / "target"
+            target.mkdir()
+            other_skill = target / "other-skill"
+            other_skill.mkdir()
+            marker = other_skill / "marker.txt"
+            marker.write_text("keep me\n", encoding="utf-8")
+            (target / "agentic-branch-e2e").symlink_to(other_skill, target_is_directory=True)
+            result = self.run_installer(
+                "--source",
+                str(source),
+                "--harness",
+                "generic",
+                "--target",
+                str(target),
+                "--force",
+                "--i-approve",
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(marker.is_file())
+            self.assertTrue((target / "agentic-branch-e2e" / "SKILL.md").is_file())
+            self.assertFalse((target / "agentic-branch-e2e").is_symlink())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -81,14 +81,45 @@ def resolve_target(args: argparse.Namespace) -> Path:
 
 
 def validate_source(source: Path) -> None:
-    symlinks = [rel for rel in INSTALL_PATHS if (source / rel).is_symlink()]
+    source_resolved = source.resolve(strict=True)
+    symlinks: list[str] = []
+    missing: list[str] = []
+    non_files: list[str] = []
+    escaped: list[str] = []
+
+    for rel in INSTALL_PATHS:
+        current = source
+        for part in Path(rel).parts:
+            current = current / part
+            if current.is_symlink():
+                symlinks.append(rel)
+                break
+        if symlinks and symlinks[-1] == rel:
+            continue
+
+        src = source / rel
+        if not src.exists():
+            missing.append(rel)
+            continue
+        src_resolved = src.resolve(strict=True)
+        if not is_relative_to(src_resolved, source_resolved):
+            escaped.append(rel)
+            continue
+        if not src.is_file():
+            non_files.append(rel)
+
     if symlinks:
         joined = "\n".join(f"- {item}" for item in symlinks)
-        raise SystemExit(f"refusing to install symlinked payload files:\n{joined}")
-    missing = [rel for rel in INSTALL_PATHS if not (source / rel).exists()]
+        raise SystemExit(f"refusing to install symlinked payload paths:\n{joined}")
     if missing:
         joined = "\n".join(f"- {item}" for item in missing)
         raise SystemExit(f"source skill is incomplete; missing:\n{joined}")
+    if escaped:
+        joined = "\n".join(f"- {item}" for item in escaped)
+        raise SystemExit(f"refusing to install payload paths outside source checkout:\n{joined}")
+    if non_files:
+        joined = "\n".join(f"- {item}" for item in non_files)
+        raise SystemExit(f"refusing to install non-file payload paths:\n{joined}")
 
 
 def is_relative_to(path: Path, parent: Path) -> bool:
@@ -101,17 +132,18 @@ def is_relative_to(path: Path, parent: Path) -> bool:
 
 def resolve_destination(source: Path, target_dir: Path, name: str) -> Path:
     target_resolved = target_dir.resolve(strict=False)
-    destination = (target_resolved / validate_install_name(name)).resolve(strict=False)
+    destination = target_resolved / validate_install_name(name)
 
     if destination.parent != target_resolved:
         raise SystemExit(f"destination escapes target directory: {destination}")
 
     source_resolved = source.resolve(strict=True)
-    if destination == source_resolved:
+    destination_resolved = destination.resolve(strict=False)
+    if destination_resolved == source_resolved:
         raise SystemExit("refusing to install over the source checkout")
-    if is_relative_to(destination, source_resolved):
+    if is_relative_to(destination_resolved, source_resolved):
         raise SystemExit("refusing to install inside the source checkout")
-    if is_relative_to(source_resolved, destination):
+    if is_relative_to(source_resolved, destination_resolved):
         raise SystemExit("refusing to install from a source inside the destination")
 
     return destination
