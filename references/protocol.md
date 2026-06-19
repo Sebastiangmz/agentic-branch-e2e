@@ -10,7 +10,7 @@ Run a feature branch locally as a real user would, then decide whether the branc
 
 Prefer an issue, ticket, PRD, or explicit user request as the source of truth. If none exists, derive the intended scope from the branch diff against the base branch and mark every criterion as inferred. Do not silently invent scope.
 
-Freeze the criteria before driving the app. Any later criterion change requires restarting the relevant drive phase.
+Freeze the criteria and evaluation plan before driving the app. Any later criterion or rubric change requires restarting the relevant drive phase.
 
 ## Anti-mask questions
 
@@ -49,9 +49,9 @@ Produce a project profile with:
 
 Stop if a required dependency, service, credential class, or runtime cannot be obtained locally with safe local/test credentials. Do not fake a service, pass production credentials to branch code, or inherit sensitive environment variables into untrusted startup commands.
 
-### Phase 1 — Freeze criteria
+### Phase 1 — Freeze criteria and evaluation plan
 
-Fetch or accept the issue/user request. Extract explicit criteria, infer missing criteria from the request, and derive at least one negative-case seed per criterion. If no issue exists, infer criteria from the diff and label them as inferred.
+Fetch or accept the issue/user request. Extract explicit criteria, infer missing criteria from the request, and label inferred criteria. For every criterion, write the evaluation plan before opening the app or sending requests: `pass_requires`, `fail_if`, `inconclusive_if`, required evidence, and at least one negative-case seed. This is the branch-E2E equivalent of eval-first development: define how the branch will be judged before observing its behavior.
 
 ### Phase 2 — Classify scope
 
@@ -63,7 +63,7 @@ Install dependencies if required, start services with project-native commands, a
 
 ### Phase 4 — Drive real user behavior
 
-For each frozen criterion, state the drive plan, enumerate the production path, drive from the real ingress, capture evidence, assert strong and weak expectations, and record the criterion verdict.
+For each frozen criterion, read the evaluation plan, state the drive plan, enumerate the production path, drive from the real ingress, capture evidence, compare observations against `pass_requires` / `fail_if` / `inconclusive_if`, and record the criterion verdict.
 
 ### Phase 5 — Bug-hunt
 
