@@ -26,11 +26,20 @@ VERDICT_RE = re.compile(r"\b(PASS|FAIL|INCONCLUSIVE)\b")
 CRITERION_RE = re.compile(r"\bC\d+\b")
 NEGATIVE_RE = re.compile(r"\bN\d+\b")
 FIDELITY_RE = re.compile(r"fidelity gap|fidelity gaps|bypassed layer", re.IGNORECASE)
-EVAL_PLAN_RE = re.compile(
-    r"pass requires|pass_requires|fail if|fail_if|inconclusive if|inconclusive_if|required evidence|negative seeds|negative_seeds",
-    re.IGNORECASE,
-)
-MERGE_BOUNDARY_RE = re.compile(r"not covered|merge readiness|merge-ready|CI|review", re.IGNORECASE)
+EVAL_TERM_PATTERNS = {
+    "pass requires": re.compile(r"^\s*(?:[-*]\s*)?(?:pass requires|pass_requires)\s*:", re.IGNORECASE | re.MULTILINE),
+    "fail if": re.compile(r"^\s*(?:[-*]\s*)?(?:fail if|fail_if)\s*:", re.IGNORECASE | re.MULTILINE),
+    "inconclusive if": re.compile(
+        r"^\s*(?:[-*]\s*)?(?:inconclusive if|inconclusive_if)\s*:", re.IGNORECASE | re.MULTILINE
+    ),
+    "required evidence": re.compile(
+        r"^\s*(?:[-*]\s*)?(?:required evidence|required_evidence)\s*:", re.IGNORECASE | re.MULTILINE
+    ),
+    "negative seeds": re.compile(
+        r"^\s*(?:[-*]\s*)?(?:negative seeds|negative_seeds)\s*:", re.IGNORECASE | re.MULTILINE
+    ),
+}
+MERGE_BOUNDARY_RE = re.compile(r"\bnot covered\b|\bmerge readiness\b|\bmerge-ready\b|\bCI\b|\breview\b", re.IGNORECASE)
 EVIDENCE_POINTER_RE = re.compile(
     r"(artifacts?/|artifact://|local://|mcp://|https?://|stdout:|stderr:|\.har\b|\.png\b|\.jpe?g\b|\.webm\b|\.log\b|\.jsonl?\b|\.txt\b|\.sqlite\b|log#|db\.txt)"
 )
@@ -54,10 +63,9 @@ def validate(text: str) -> list[str]:
     if not NEGATIVE_RE.search(text):
         errors.append("missing negative-case IDs like N1")
 
-    eval_terms = {match.lower().replace("_", " ") for match in EVAL_PLAN_RE.findall(text)}
-    required_eval_terms = {"pass requires", "fail if", "inconclusive if", "required evidence", "negative seeds"}
-    if not required_eval_terms.issubset(eval_terms):
-        missing = ", ".join(sorted(required_eval_terms - eval_terms))
+    missing_eval_terms = [term for term, pattern in EVAL_TERM_PATTERNS.items() if not pattern.search(text)]
+    if missing_eval_terms:
+        missing = ", ".join(missing_eval_terms)
         errors.append(f"missing evaluation-plan terms: {missing}")
 
     if not EVIDENCE_POINTER_RE.search(text):

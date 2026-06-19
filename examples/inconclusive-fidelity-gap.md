@@ -83,6 +83,10 @@ Reason: The direct service call suggests the domain rule exists, but the real in
 
 Start the project-supported auth emulator or local test identity provider, then rerun C1 from the browser UI or real HTTP route. Do not use a hand-rolled auth bypass, and do not reuse the internal service call as proof.
 
+## Not covered
+
+- Merge readiness, CI, and review-thread status were not checked by this run.
+
 ## Teardown
 
 - Services stopped: api process
