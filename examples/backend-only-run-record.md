@@ -30,6 +30,14 @@
 - Production path: HTTP route → HMAC verification → JSON schema validation → enqueue payment event → queue consumer → database
 - Drive plan: send signed webhook once with active secret and once with next secret, then verify accepted responses, enqueued jobs, and persisted payment events.
 
+Evaluation plan:
+
+- Pass requires: both active-secret and next-secret webhooks return 202, both enqueue jobs, both jobs persist payment events, and logs contain no signature/schema warnings.
+- Fail if: either valid signature is rejected, accepted requests skip queue processing, duplicate events are persisted, plaintext secrets appear in logs, or any request returns 5xx.
+- Inconclusive if: HMAC verification is bypassed, queue consumer is not running, datastore state cannot be inspected, or requests do not use the real local HTTP route.
+- Required evidence: response captures for both requests, worker logs, queue observation, database query output, rejected-job/error capture.
+- Negative seeds: invalid signature, legacy payload missing required id.
+
 Evidence:
 
 - Network: `artifacts/c1-active-response.txt`, `artifacts/c1-next-response.txt`, both returned 202

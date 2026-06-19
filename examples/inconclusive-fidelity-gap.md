@@ -31,6 +31,14 @@
 - Production path exercised: invite service → database
 - Drive plan attempted: open invite UI and submit `external-user@example.test` as an admin.
 
+Evaluation plan:
+
+- Pass requires: invite creation through browser UI or real `POST /api/invites` rejects non-company domains, shows a user-safe error, writes no invite row, and enqueues no email.
+- Fail if: non-company invite succeeds, an invite row is persisted, an email job is queued, or the rejection leaks unsafe/internal error details.
+- Inconclusive if: auth emulator is unavailable, session auth is bypassed, HTTP route is not reached, schema validation is skipped, or UI/browser evidence is missing.
+- Required evidence: UI or route request/response capture, startup/app logs, database query output, email queue observation, error capture.
+- Negative seeds: external-domain invite, malformed invite payload.
+
 Evidence:
 
 - UI: not captured; local app could not start because the auth provider emulator was missing.
@@ -74,6 +82,10 @@ Reason: The direct service call suggests the domain rule exists, but the real in
 ## Required next action
 
 Start the project-supported auth emulator or local test identity provider, then rerun C1 from the browser UI or real HTTP route. Do not use a hand-rolled auth bypass, and do not reuse the internal service call as proof.
+
+## Not covered
+
+- Merge readiness, CI, and review-thread status were not checked by this run.
 
 ## Teardown
 

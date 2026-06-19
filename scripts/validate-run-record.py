@@ -15,6 +15,7 @@ REQUIRED_PHRASES = [
     "Project profile",
     "Scope classification",
     "Frozen criteria",
+    "Evaluation plan",
     "Evidence",
     "Negative cases",
     "Overall verdict",
@@ -25,7 +26,20 @@ VERDICT_RE = re.compile(r"\b(PASS|FAIL|INCONCLUSIVE)\b")
 CRITERION_RE = re.compile(r"\bC\d+\b")
 NEGATIVE_RE = re.compile(r"\bN\d+\b")
 FIDELITY_RE = re.compile(r"fidelity gap|fidelity gaps|bypassed layer", re.IGNORECASE)
-MERGE_BOUNDARY_RE = re.compile(r"not covered|merge readiness|merge-ready|CI|review", re.IGNORECASE)
+EVAL_TERM_PATTERNS = {
+    "pass requires": re.compile(r"^\s*(?:[-*]\s*)?(?:pass requires|pass_requires)\s*:", re.IGNORECASE | re.MULTILINE),
+    "fail if": re.compile(r"^\s*(?:[-*]\s*)?(?:fail if|fail_if)\s*:", re.IGNORECASE | re.MULTILINE),
+    "inconclusive if": re.compile(
+        r"^\s*(?:[-*]\s*)?(?:inconclusive if|inconclusive_if)\s*:", re.IGNORECASE | re.MULTILINE
+    ),
+    "required evidence": re.compile(
+        r"^\s*(?:[-*]\s*)?(?:required evidence|required_evidence)\s*:", re.IGNORECASE | re.MULTILINE
+    ),
+    "negative seeds": re.compile(
+        r"^\s*(?:[-*]\s*)?(?:negative seeds|negative_seeds)\s*:", re.IGNORECASE | re.MULTILINE
+    ),
+}
+MERGE_BOUNDARY_RE = re.compile(r"\bnot covered\b|\bmerge readiness\b|\bmerge-ready\b|\bCI\b|\breview\b", re.IGNORECASE)
 EVIDENCE_POINTER_RE = re.compile(
     r"(artifacts?/|artifact://|local://|mcp://|https?://|stdout:|stderr:|\.har\b|\.png\b|\.jpe?g\b|\.webm\b|\.log\b|\.jsonl?\b|\.txt\b|\.sqlite\b|log#|db\.txt)"
 )
@@ -48,6 +62,11 @@ def validate(text: str) -> list[str]:
 
     if not NEGATIVE_RE.search(text):
         errors.append("missing negative-case IDs like N1")
+
+    missing_eval_terms = [term for term, pattern in EVAL_TERM_PATTERNS.items() if not pattern.search(text)]
+    if missing_eval_terms:
+        missing = ", ".join(missing_eval_terms)
+        errors.append(f"missing evaluation-plan terms: {missing}")
 
     if not EVIDENCE_POINTER_RE.search(text):
         errors.append("missing evidence pointers such as artifact paths, HAR, screenshots, logs, or URLs")

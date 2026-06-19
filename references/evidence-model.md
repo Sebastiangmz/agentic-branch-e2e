@@ -26,6 +26,17 @@ criteria:
   - id: C1
     text: string
     source: explicit | inferred
+    evaluation_plan:
+      pass_requires: [string]
+      fail_if: [string]
+      inconclusive_if: [string]
+      required_evidence:
+        ui: string
+        network: string
+        logs: string
+        backend_state: string
+        errors: string
+      negative_seeds: [string]
     production_path: [ingress, auth, validation, service, persistence]
     drive_plan: string
     evidence:
@@ -58,6 +69,18 @@ teardown:
   temporary_edits_reverted: [string]
   working_tree_status: clean | dirty
 ```
+
+## Evaluation plan
+
+Write the evaluation plan before driving the app. It is the frozen rubric for the criterion:
+
+- `pass_requires` lists observations that all must be true for PASS.
+- `fail_if` lists observations that immediately make the criterion FAIL.
+- `inconclusive_if` lists missing layers, missing evidence, or adapter limits that prevent a confident verdict.
+- `required_evidence` names the evidence classes needed before the run starts.
+- `negative_seeds` are the first negative cases to drive in the bug-hunt phase.
+
+Do not rewrite the plan after seeing app behavior unless the affected criterion is restarted and the run record says why.
 
 ## Evidence fields
 
