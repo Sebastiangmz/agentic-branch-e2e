@@ -30,6 +30,14 @@
 - Production path: browser UI → session auth → `POST /api/refunds/:id/approve` → request validation → refund service → audit writer → postgres
 - Drive plan: sign in as seeded admin, open pending refund, click Approve, confirm modal, observe success state, verify persisted refund status and audit row.
 
+Evaluation plan:
+
+- Pass requires: success UI state appears, `POST /api/refunds/:id/approve` returns 200, refund status persists as approved, one audit row is written, and no clean-signal checks report errors.
+- Fail if: approval button does nothing, route returns 4xx/5xx for seeded admin, refund status remains pending, duplicate audit rows are written, or unrelated refund rows change.
+- Inconclusive if: admin auth is bypassed, network capture is missing, database/audit state cannot be inspected, or browser UI is not exercised.
+- Required evidence: UI screenshot/DOM after approval, network HAR for the approval request, API logs, database/audit query output, browser console/error capture.
+- Negative seeds: non-admin approval attempt, double-click/retry approval.
+
 Evidence:
 
 - UI: `artifacts/c1-after-approve.png`, DOM excerpt shows `Refund approved`
